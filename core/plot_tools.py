@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import seaborn as sns
+import os
 
 def plot_all_in_one(macro_df, spy_price, strategy_data, tickers):
     """Single figure with 3 stacked subplots: Regime overlay, cumulative returns, heatmap."""
@@ -76,6 +77,19 @@ def plot_all_in_one(macro_df, spy_price, strategy_data, tickers):
     plt.tight_layout()
     plt.show(block=False)
     plt.pause(0.1)  # 👈 Ensure the window gets drawn
+
+    # Ensure the output directory exists in the project folder
+    output_dir = os.path.join(os.getcwd(), "output")  # Create 'output' in the current working directory
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save the plot to the output directory
+    output_path = os.path.join(output_dir, "macro_strategy_overview.png")
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')  # Save the plot with high resolution
+
+    print(f"Plot saved to {output_path}")
+
+    # Show the plot
+    plt.show(block=False)
+    plt.pause(0.1)  # 👈 Ensure the window gets drawn
     input("🔚 Press Enter to close the chart and quit...")
     plt.close('all')
-
