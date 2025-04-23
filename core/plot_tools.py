@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import seaborn as sns
+import os
 
 def plot_all_in_one(macro_df, spy_price, strategy_data, tickers):
     """Single figure with 3 stacked subplots: Regime overlay, cumulative returns, heatmap."""
@@ -76,6 +77,68 @@ def plot_all_in_one(macro_df, spy_price, strategy_data, tickers):
     plt.tight_layout()
     plt.show(block=False)
     plt.pause(0.1)  # 👈 Ensure the window gets drawn
+
+
+    # Ensure the output directory exists in the project folder
+    output_dir = os.path.join(os.getcwd(), "output")  # Create 'output' in the current working directory
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save the plot to the output directory
+    output_path = os.path.join(output_dir, "macro_strategy_overview.png")
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')  # Save the plot with high resolution
+
+    print(f"Plot saved to {output_path}")
+
+    # Show the plot
+    plt.show(block=False)
+    plt.pause(0.1)  # 👈 Ensure the window gets drawn
+
     input("🔚 Press Enter to close the chart and quit...")
     plt.close('all')
+
+def plot_regimes_in_feature_space(macro_df, centroids):
+    """
+    Scatter plot of macro points colored by regime,
+    with centroids overlaid.
+    """
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(
+        data=macro_df,
+        x="CPI_Momentum", y="GDP_Momentum",
+        hue="Regime", palette="Set2", s=50, alpha=0.7, edgecolor="gray"
+    )
+
+    # Plot centroids
+    for regime, coords in centroids.items():
+        plt.scatter(coords[0], coords[1], marker='X', s=200, color='black')
+        plt.text(coords[0], coords[1], regime, fontsize=9, ha='center', va='center', color='white', weight='bold')
+
+    plt.title("Macro Regimes in Feature Space")
+    plt.xlabel("CPI Momentum")
+    plt.ylabel("GDP Momentum")
+    plt.axhline(0, color='gray', linewidth=0.5)
+    plt.axvline(0, color='gray', linewidth=0.5)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_regime_scores_over_time(regime_scores):
+    """
+    Plot stacked area chart of regime scores over time.
+    """
+    regime_scores = regime_scores.fillna(0)
+    regime_scores = regime_scores[sorted(regime_scores.columns)]
+
+    fig, ax = plt.subplots(figsize=(12, 4))
+    regime_scores.plot.area(ax=ax, alpha=0.7, linewidth=0, colormap='tab10')
+
+    ax.set_title("Regime Score Evolution Over Time")
+    ax.set_ylabel("Score (Probability)")
+    ax.set_xlabel("Date")
+    ax.set_ylim(0, 1.05)
+    ax.grid(True, linestyle='--', alpha=0.4)
+    ax.legend(loc='upper left', ncol=4)
+    plt.tight_layout()
+    plt.show()
 

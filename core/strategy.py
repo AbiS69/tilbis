@@ -3,43 +3,52 @@
 import pandas as pd
 
 def get_weights(regime, tickers):
-    """Return asset weights based on the regime."""
+    """Return asset weights based on the regime, normalized to gross exposure = 1."""
     weights = {
+        # 📈 Recovery: Risk-on, favoring growth, financials, real assets
         'Recovery': {
-            'QQQ': 0.25,
+            'QQQ': 0.30,
             'XLF': 0.20,
             'VNQ': 0.20,
-            'SPY': 0.20,
+            'SPY': 0.15,
             'EFA': 0.15
         },
-        'Overheat': {
-            'GSG': 0.25,
-            'GLD': 0.20,
-            'SPY': 0.20,
-            'XLF': 0.15,
-            'XLU': 0.20
-        },
+
+        # 🌅 Reflation: Early-cycle beta, tech, gold, real estate, utilities
         'Reflation': {
-            'QQQ': 0.25,
-            'EFA': 0.20,
+            'QQQ': 0.30,
+            'GLD': 0.20,
             'VNQ': 0.20,
-            'XLF': 0.15,
-            'SPY': 0.20
+            'EFA': 0.15,
+            'XLU': 0.15
         },
+
+        # 🌡️ Overheat: Inflation hedge tilt — gold, commodities, defensives
+        'Overheat': {
+            'GLD': 0.25,
+            'GSG': 0.20,
+            'QQQ': 0.15,
+            'XLF': 0.15,
+            'XLU': 0.25
+        },
+
+        # 🔥 Stagflation: Defensive long dollar + bonds, short equities and cyclicals
         'Stagflation': {
-            'GLD': 0.30,
-            'TLT': 0.20,
-            'IEF': 0.10,
-            'GSG': -0.30,
+            'DDX-Y.NYB': 0.30,
+            'TLT': 0.10,
+            'GSG': -0.10,
             'SPY': -0.10,
-            'QQQ': -0.10
+            'QQQ': -0.10,
+            'XLF': -0.10,
+            'EFA': -0.15
         }
     }
 
+    # Fallback if regime is unknown: equal-weight
     fallback = {k: 1 / len(tickers) for k in tickers}
     regime_weights = weights.get(regime, fallback)
 
-    # Normalize to sum of absolute weights = 1 (gross exposure)
+    # Normalize to gross exposure = 1.0
     gross = sum(abs(v) for v in regime_weights.values())
     return {k: v / gross for k, v in regime_weights.items()}
 
