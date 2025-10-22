@@ -1,0 +1,1 @@
+Systematic Global Macro Strategies - This is a systematic global macro asset allocation model, with the cornerstone being the classification of the macroeconomic regime. We define four main regimes : Recovery, Reflation, Stagflation, Overheat defined by a lot of economic indicators but with a strong emphasis on Inflation growth and GDP growth
